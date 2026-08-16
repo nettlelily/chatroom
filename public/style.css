@@ -73,7 +73,7 @@ input:focus {
 }
 
 .card {
-  width: min(100%, 920px);
+  width: min(100%, 1200px);
   border: 1px solid var(--border);
   border-radius: 28px;
   background: var(--card);
@@ -169,7 +169,7 @@ h2 {
 
 .chat-card {
   display: grid;
-  grid-template-rows: auto minmax(360px, 62vh) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
 }
 
@@ -211,21 +211,40 @@ h2 {
   min-height: 44px;
 }
 
-.call-shell {
+.chat-workspace {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
   gap: 16px;
-  border-bottom: 1px solid var(--border);
-  padding: 16px 20px;
+  min-height: 0;
+  padding: 16px 20px 20px;
+}
+
+.chat-sidebar,
+.chat-main {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.chat-main {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.roster-panel,
+.call-panel,
+.chat-main,
+.message-form,
+.messages {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.42);
 }
 
 .roster-panel,
 .call-panel {
   display: grid;
   gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.42);
   padding: 16px;
 }
 
@@ -319,14 +338,18 @@ h2 {
 }
 
 #remoteAudio {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .messages {
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: auto;
   padding: 20px;
 }
 
@@ -360,6 +383,10 @@ h2 {
 
 .message.claude-call {
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.08);
+}
+
+.message.attachment {
+  max-width: min(86%, 640px);
 }
 
 .message.system {
@@ -399,9 +426,40 @@ h2 {
   white-space: pre-wrap;
 }
 
+.attachment-preview {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 12px;
+}
+
+.attachment-preview img {
+  max-width: 100%;
+  border-radius: 12px;
+  display: block;
+}
+
+.attachment-link {
+  color: var(--primary-dark);
+  font-weight: 800;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.attachment-link:hover {
+  text-decoration: underline;
+}
+
+.message.attachment .message-body {
+  display: grid;
+  gap: 10px;
+}
+
 .message-form {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 10px;
   border-top: 1px solid var(--border);
   padding: 16px;
@@ -411,64 +469,62 @@ h2 {
   min-width: 92px;
 }
 
+.message-form .ghost-button {
+  min-width: 108px;
+}
+
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
+  border: 0;
 }
 
-@media (max-width: 760px) {
-  .auth-grid {
+@media (max-width: 920px) {
+  .chat-workspace {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .app {
-    align-items: stretch;
-    padding: 0;
-  }
-
-  .card {
-    min-height: 100vh;
-    border-radius: 0;
-  }
-
-  .chat-card {
-    grid-template-rows: auto auto 1fr auto;
-  }
-
-  .chat-header,
-  .header-actions {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .call-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .call-panel-top {
-    flex-direction: column;
-  }
-
-  .message {
-    max-width: 92%;
   }
 
   .message-form {
     grid-template-columns: 1fr;
   }
 
-  .message-form button {
-    min-height: 48px;
+  .message-form .ghost-button,
+  .message-form button[type="submit"] {
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .chat-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .chat-workspace {
+    padding: 12px;
+  }
+
+  .roster-panel,
+  .call-panel,
+  .messages,
+  .message-form {
+    border-radius: 18px;
   }
 }
 
@@ -487,7 +543,12 @@ h2 {
   }
 
   input,
-  .auth-block {
+  .auth-block,
+  .roster-user,
+  .roster-panel,
+  .call-panel,
+  .messages,
+  .message-form {
     background: rgba(15, 23, 42, 0.86);
   }
 }
