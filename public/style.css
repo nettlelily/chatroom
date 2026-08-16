@@ -211,6 +211,117 @@ h2 {
   min-height: 44px;
 }
 
+.call-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+}
+
+.roster-panel,
+.call-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.42);
+  padding: 16px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.roster-panel h2,
+.call-panel h2 {
+  font-size: 18px;
+}
+
+.roster-list {
+  display: grid;
+  gap: 10px;
+}
+
+.roster-empty {
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: var(--muted);
+  padding: 14px;
+}
+
+.roster-user {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.56);
+  padding: 12px;
+}
+
+.roster-user.busy {
+  opacity: 0.68;
+}
+
+.roster-user.selected {
+  border-color: rgba(79, 70, 229, 0.38);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+}
+
+.roster-user-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.roster-user-name {
+  font-weight: 800;
+}
+
+.roster-user-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.roster-user button {
+  min-height: 42px;
+}
+
+.call-panel-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.call-status-badge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.12);
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 12px;
+}
+
+.call-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.call-actions button {
+  min-height: 44px;
+}
+
+#remoteAudio {
+  display: none;
+}
+
 .messages {
   display: flex;
   flex-direction: column;
@@ -331,12 +442,20 @@ h2 {
   }
 
   .chat-card {
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
   }
 
   .chat-header,
   .header-actions {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .call-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .call-panel-top {
     flex-direction: column;
   }
 

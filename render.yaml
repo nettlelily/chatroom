@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: chatroom
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /var/data/chatroom.sqlite
+      - key: ANTHROPIC_MODEL
+        value: gpt-5.5
+      - key: ANTHROPIC_BASE_URL
+        sync: false
+      - key: ANTHROPIC_AUTH_TOKEN
+        sync: false
+    disk:
+      name: chatroom-data
+      mountPath: /var/data
+      sizeGB: 1

@@ -209,3 +209,119 @@ test("register rejects reserved Claude username", async () => {
     await chatServer.cleanup();
   }
 });
+
+test("roster lists other logged-in users and excludes current user", async () => {
+  const chatServer = await startTestServer();
+
+  try {
+    const { socket: aliceSocket, joined: aliceJoined } = await registerAndConnect(chatServer, "alice");
+    const rosters = [];
+    aliceSocket.on("roster", (payload) => {
+      rosters.push(payload);
+    });
+
+    const { socket: bobSocket, joined: bobJoined } = await registerAndConnect(chatServer, "bob");
+    await waitForCount(rosters, 1);
+
+    const latestRoster = rosters.at(-1);
+    assert.ok(Array.isArray(latestRoster));
+    assert.deepEqual(
+      latestRoster.map((user) => user.name).sort(),
+      ["alice", "bob"]
+    );
+
+    const aliceVisibleToAlice = latestRoster.some((user) => user.userId === aliceJoined.userId);
+    const bobVisibleToAlice = latestRoster.some((user) => user.userId === bobJoined.userId);
+    assert.equal(aliceVisibleToAlice, true);
+    assert.equal(bobVisibleToAlice, true);
+
+    aliceSocket.disconnect();
+    bobSocket.disconnect();
+  } finally {
+    await chatServer.cleanup();
+  }
+});
+
+test("call invite forwards to target and accept enables signaling", async () => {
+  const chatServer = await startTestServer();
+
+  try {
+    const { socket: aliceSocket, joined: aliceJoined } = await registerAndConnect(chatServer, "alice");
+    const { socket: bobSocket, joined: bobJoined } = await registerAndConnect(chatServer, "bob");
+
+    const incomingEvents = [];
+    const acceptedEvents = [];
+    const signalEvents = [];
+
+    bobSocket.on("call:incoming", (payload) => incomingEvents.push(payload));
+    aliceSocket.on("call:accepted", (payload) => acceptedEvents.push(payload));
+    bobSocket.on("call:signal", (payload) => signalEvents.push(payload));
+
+    aliceSocket.emit("call:invite", { toUserId: bobJoined.userId });
+    await waitForCount(incomingEvents, 1);
+    assert.equal(incomingEvents[0].from.userId, aliceJoined.userId);
+    assert.equal(incomingEvents[0].from.name, "alice");
+
+    bobSocket.emit("call:accept", { withUserId: aliceJoined.userId });
+    await waitForCount(acceptedEvents, 1);
+    assert.equal(acceptedEvents[0].from.userId, bobJoined.userId);
+
+    aliceSocket.emit("call:signal", {
+      toUserId: bobJoined.userId,
+      description: { type: "offer", sdp: "fake-offer" }
+    });
+    await waitForCount(signalEvents, 1);
+    assert.equal(signalEvents[0].from.userId, aliceJoined.userId);
+    assert.equal(signalEvents[0].description.type, "offer");
+
+    aliceSocket.disconnect();
+    bobSocket.disconnect();
+  } finally {
+    await chatServer.cleanup();
+  }
+});
+
+test("busy target rejects second caller and hangup clears busy state", async () => {
+  const chatServer = await startTestServer();
+
+  try {
+    const { socket: aliceSocket, joined: aliceJoined } = await registerAndConnect(chatServer, "alice");
+    const { socket: bobSocket, joined: bobJoined } = await registerAndConnect(chatServer, "bob");
+    const { socket: carolSocket } = await registerAndConnect(chatServer, "carol");
+
+    const bobIncomingEvents = [];
+    const aliceAcceptedEvents = [];
+    const bobEndedEvents = [];
+    const carolBusyEvents = [];
+    const carolRosterEvents = [];
+
+    bobSocket.on("call:incoming", (payload) => bobIncomingEvents.push(payload));
+    aliceSocket.on("call:accepted", (payload) => aliceAcceptedEvents.push(payload));
+    bobSocket.on("call:ended", (payload) => bobEndedEvents.push(payload));
+    carolSocket.on("call:busy", (payload) => carolBusyEvents.push(payload));
+    carolSocket.on("roster", (payload) => carolRosterEvents.push(payload));
+
+    aliceSocket.emit("call:invite", { toUserId: bobJoined.userId });
+    await waitForCount(bobIncomingEvents, 1);
+    bobSocket.emit("call:accept", { withUserId: aliceJoined.userId });
+    await waitForCount(aliceAcceptedEvents, 1);
+
+    carolSocket.emit("call:invite", { toUserId: bobJoined.userId });
+    await waitForCount(carolBusyEvents, 1);
+    assert.match(carolBusyEvents[0].message, /通话中/);
+
+    aliceSocket.emit("call:hangup", { withUserId: bobJoined.userId });
+    await waitForCount(bobEndedEvents, 1);
+    await waitForCount(carolRosterEvents, 1);
+
+    const latestRoster = carolRosterEvents.at(-1);
+    const bobRecord = latestRoster.find((user) => user.userId === bobJoined.userId);
+    assert.equal(bobRecord.busy, false);
+
+    aliceSocket.disconnect();
+    bobSocket.disconnect();
+    carolSocket.disconnect();
+  } finally {
+    await chatServer.cleanup();
+  }
+});
