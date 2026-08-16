@@ -11,6 +11,7 @@
   --bubble: #f7f8fc;
   --mine: #e0e7ff;
   --temporary: #fff4d6;
+  --mention: #ffe4a3;
   --danger: #b91c1c;
   font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
 }
@@ -236,6 +237,20 @@ h2 {
   background: var(--temporary);
 }
 
+.message.mention {
+  border: 1px solid rgba(217, 119, 6, 0.32);
+  background: var(--mention);
+}
+
+.message.bot {
+  border: 1px solid rgba(79, 70, 229, 0.26);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(129, 140, 248, 0.18));
+}
+
+.message.claude-call {
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.08);
+}
+
 .message.system {
   align-self: center;
   max-width: 90%;
@@ -256,8 +271,16 @@ h2 {
 }
 
 .message-name {
+  border: 0;
+  background: transparent;
   color: var(--primary-dark);
+  cursor: pointer;
   font-weight: 800;
+  padding: 0;
+}
+
+.message-name:hover {
+  text-decoration: underline;
 }
 
 .message-body {
@@ -341,6 +364,7 @@ h2 {
     --bubble: rgba(30, 41, 59, 0.92);
     --mine: rgba(79, 70, 229, 0.38);
     --temporary: rgba(180, 120, 0, 0.24);
+    --mention: rgba(245, 158, 11, 0.22);
   }
 
   input,
