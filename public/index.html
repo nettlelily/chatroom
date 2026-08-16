@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>临时网页聊天室</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section id="joinPanel" class="card join-card" aria-labelledby="joinTitle">
+        <p class="eyebrow">Text Chatroom</p>
+        <h1 id="joinTitle">临时网页聊天室</h1>
+        <p class="muted">输入昵称后进入。把 Cloudflare Tunnel 生成的网址发给别人，对方有网就能加入。</p>
+        <form id="joinForm" class="join-form">
+          <label for="nameInput">昵称</label>
+          <input id="nameInput" name="name" type="text" maxlength="20" autocomplete="nickname" placeholder="例如：小明" required />
+          <button type="submit">进入聊天室</button>
+        </form>
+      </section>
+
+      <section id="chatPanel" class="card chat-card hidden" aria-label="聊天室">
+        <header class="chat-header">
+          <div>
+            <h1>聊天室</h1>
+            <p id="currentName" class="muted"></p>
+          </div>
+          <div class="online-badge">在线 <span id="onlineCount">0</span></div>
+        </header>
+
+        <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+        <form id="messageForm" class="message-form">
+          <label class="sr-only" for="messageInput">聊天内容</label>
+          <input id="messageInput" name="message" type="text" maxlength="500" autocomplete="off" placeholder="输入文字消息..." />
+          <button type="submit">发送</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/client.js"></script>
+  </body>
+</html>
