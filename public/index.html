@@ -8,15 +8,45 @@
   </head>
   <body>
     <main class="app">
-      <section id="joinPanel" class="card join-card" aria-labelledby="joinTitle">
+      <section id="authPanel" class="card join-card" aria-labelledby="authTitle">
         <p class="eyebrow">Text Chatroom</p>
-        <h1 id="joinTitle">临时网页聊天室</h1>
-        <p class="muted">输入昵称后进入。把 Cloudflare Tunnel 生成的网址发给别人，对方有网就能加入。</p>
-        <form id="joinForm" class="join-form">
-          <label for="nameInput">昵称</label>
-          <input id="nameInput" name="name" type="text" maxlength="20" autocomplete="nickname" placeholder="例如：小明" required />
-          <button type="submit">进入聊天室</button>
-        </form>
+        <h1 id="authTitle">临时网页聊天室</h1>
+        <p class="muted">匿名可直接进入但下线后不保留；注册账号后，下次登录还能看到账号历史消息。</p>
+
+        <div class="auth-grid">
+          <section class="auth-block" aria-labelledby="guestTitle">
+            <h2 id="guestTitle">匿名进入</h2>
+            <p class="muted small">系统会分配一个随机临时昵称，离开后失效。</p>
+            <button id="guestButton" type="button">匿名进入聊天室</button>
+          </section>
+
+          <section class="auth-block" aria-labelledby="accountTitle">
+            <h2 id="accountTitle">账号模式</h2>
+            <p class="muted small">注册后可登录，并看到最近保存的账号消息。</p>
+            <div class="tabs" role="tablist" aria-label="账号操作">
+              <button id="showLogin" class="tab active" type="button">登录</button>
+              <button id="showRegister" class="tab" type="button">注册</button>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+              <label for="loginName">用户名</label>
+              <input id="loginName" name="username" type="text" maxlength="20" autocomplete="username" required />
+              <label for="loginPassword">密码</label>
+              <input id="loginPassword" name="password" type="password" minlength="6" maxlength="72" autocomplete="current-password" required />
+              <button type="submit">登录</button>
+            </form>
+
+            <form id="registerForm" class="auth-form hidden">
+              <label for="registerName">用户名</label>
+              <input id="registerName" name="username" type="text" maxlength="20" autocomplete="username" required />
+              <label for="registerPassword">密码</label>
+              <input id="registerPassword" name="password" type="password" minlength="6" maxlength="72" autocomplete="new-password" required />
+              <button type="submit">注册并进入</button>
+            </form>
+          </section>
+        </div>
+
+        <p id="authMessage" class="status muted" role="status" aria-live="polite"></p>
       </section>
 
       <section id="chatPanel" class="card chat-card hidden" aria-label="聊天室">
@@ -24,8 +54,12 @@
           <div>
             <h1>聊天室</h1>
             <p id="currentName" class="muted"></p>
+            <p id="modeHint" class="muted small"></p>
           </div>
-          <div class="online-badge">在线 <span id="onlineCount">0</span></div>
+          <div class="header-actions">
+            <div class="online-badge">在线 <span id="onlineCount">0</span></div>
+            <button id="logoutButton" class="ghost-button hidden" type="button">退出账号</button>
+          </div>
         </header>
 
         <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>

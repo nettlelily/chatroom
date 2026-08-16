@@ -10,6 +10,8 @@
   --system: #eef2ff;
   --bubble: #f7f8fc;
   --mine: #e0e7ff;
+  --temporary: #fff4d6;
+  --danger: #b91c1c;
   font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
 }
 
@@ -70,7 +72,7 @@ input:focus {
 }
 
 .card {
-  width: min(100%, 820px);
+  width: min(100%, 920px);
   border: 1px solid var(--border);
   border-radius: 28px;
   background: var(--card);
@@ -91,9 +93,17 @@ input:focus {
   text-transform: uppercase;
 }
 
-h1 {
+h1,
+h2 {
   margin: 0;
+}
+
+h1 {
   font-size: clamp(28px, 5vw, 44px);
+}
+
+h2 {
+  font-size: 20px;
 }
 
 .muted {
@@ -101,14 +111,59 @@ h1 {
   line-height: 1.7;
 }
 
-.join-form {
+.small {
+  font-size: 14px;
+}
+
+.auth-grid {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
   margin-top: 28px;
 }
 
-.join-form button {
+.auth-block {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.48);
+  padding: 20px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-form button,
+#guestButton {
   min-height: 52px;
+}
+
+.tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.tab {
+  background: rgba(79, 70, 229, 0.12);
+  color: var(--primary-dark);
+}
+
+.tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.status {
+  min-height: 24px;
+  margin: 16px 0 0;
+}
+
+.status.error {
+  color: var(--danger);
 }
 
 .chat-card {
@@ -134,6 +189,12 @@ h1 {
   margin: 4px 0 0;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .online-badge {
   flex: 0 0 auto;
   border-radius: 999px;
@@ -141,6 +202,12 @@ h1 {
   color: var(--primary-dark);
   font-weight: 800;
   padding: 10px 14px;
+}
+
+.ghost-button {
+  background: rgba(79, 70, 229, 0.12);
+  color: var(--primary-dark);
+  min-height: 44px;
 }
 
 .messages {
@@ -162,6 +229,11 @@ h1 {
 .message.mine {
   align-self: flex-end;
   background: var(--mine);
+}
+
+.message.temporary {
+  border: 1px dashed rgba(180, 120, 0, 0.38);
+  background: var(--temporary);
 }
 
 .message.system {
@@ -218,6 +290,12 @@ h1 {
   white-space: nowrap;
 }
 
+@media (max-width: 760px) {
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .app {
     align-items: stretch;
@@ -233,7 +311,8 @@ h1 {
     grid-template-rows: auto 1fr auto;
   }
 
-  .chat-header {
+  .chat-header,
+  .header-actions {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -261,9 +340,11 @@ h1 {
     --system: rgba(99, 102, 241, 0.14);
     --bubble: rgba(30, 41, 59, 0.92);
     --mine: rgba(79, 70, 229, 0.38);
+    --temporary: rgba(180, 120, 0, 0.24);
   }
 
-  input {
+  input,
+  .auth-block {
     background: rgba(15, 23, 42, 0.86);
   }
 }
