@@ -484,6 +484,10 @@ h2 {
   display: none !important;
 }
 
+.mobile-only {
+  display: none;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -510,12 +514,34 @@ h2 {
     width: 100%;
   }
 
-  /* 移动端隐藏侧边栏，但来电面板例外 */
-  .chat-sidebar {
-    display: none;
+  /* 移动端显示通话按钮 */
+  .mobile-only {
+    display: inline-block !important;
   }
 
-  /* 移动端来电通知作为全屏覆盖层显示 */
+  /* 移动端侧边栏默认隐藏，可通过按钮显示为全屏覆盖层 */
+  .chat-sidebar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1500;
+    background: var(--card);
+    backdrop-filter: blur(24px);
+    padding: 20px;
+    overflow-y: auto;
+    gap: 20px;
+  }
+
+  .chat-sidebar.show-mobile {
+    display: grid !important;
+  }
+
+  /* 移动端来电面板全屏覆盖 */
   .call-panel:not(.hidden) {
     display: grid !important;
     position: fixed;
