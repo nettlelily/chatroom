@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TURN 服务器测试</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    button:hover {
+      background: #4338ca;
+    }
+    #results {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    .success {
+      color: #16a34a;
+      font-weight: bold;
+    }
+    .error {
+      color: #dc2626;
+      font-weight: bold;
+    }
+    .info {
+      color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔄 TURN 服务器连接测试</h1>
+    <p>这个工具会测试你的网络能否连接到 TURN 服务器（用于跨网络语音通话）</p>
+
+    <button onclick="testTurnServers()">开始测试</button>
+    <button onclick="clearResults()">清空结果</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    const resultsDiv = document.getElementById('results');
+
+    function log(message, type = 'info') {
+      const line = document.createElement('div');
+      line.className = type;
+      line.textContent = message;
+      resultsDiv.appendChild(line);
+      resultsDiv.scrollTop = resultsDiv.scrollHeight;
+    }
+
+    function clearResults() {
+      resultsDiv.innerHTML = '';
+    }
+
+    async function testTurnServers() {
+      clearResults();
+      log('开始测试 TURN 服务器...', 'info');
+      log('', 'info');
+
+      // 获取服务器配置
+      let iceServers;
+      try {
+        const response = await fetch('/api/rtc-config');
+        const data = await response.json();
+        iceServers = data.iceServers;
+        log(`✓ 从服务器获取到 ${iceServers.length} 个 ICE 服务器配置`, 'success');
+        log('', 'info');
+      } catch (error) {
+        log(`✗ 无法获取服务器配置: ${error.message}`, 'error');
+        return;
+      }
+
+      // 显示配置
+      log('ICE 服务器配置:', 'info');
+      iceServers.forEach((server, index) => {
+        const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
+        urls.forEach(url => {
+          if (url.startsWith('stun:')) {
+            log(`  ${index + 1}. STUN: ${url}`, 'info');
+          } else if (url.startsWith('turn:')) {
+            log(`  ${index + 1}. TURN: ${url}`, 'info');
+            log(`      用户名: ${server.username || '(无)'}`, 'info');
+          }
+        });
+      });
+      log('', 'info');
+
+      // 创建 RTCPeerConnection 测试
+      log('创建 RTCPeerConnection 并收集 ICE candidates...', 'info');
+
+      const pc = new RTCPeerConnection({ iceServers });
+      const candidates = {
+        host: 0,
+        srflx: 0,
+        relay: 0
+      };
+
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          const type = event.candidate.type;
+          candidates[type] = (candidates[type] || 0) + 1;
+
+          if (type === 'relay') {
+            log(`✓ 找到 RELAY candidate! (TURN 服务器工作正常)`, 'success');
+            log(`  地址: ${event.candidate.address}:${event.candidate.port}`, 'info');
+          } else if (type === 'srflx') {
+            log(`✓ 找到 SRFLX candidate (STUN 工作正常)`, 'success');
+          } else if (type === 'host') {
+            log(`  找到 HOST candidate (本地网络)`, 'info');
+          }
+        }
+      };
+
+      pc.onicegatheringstatechange = () => {
+        log(`ICE 收集状态: ${pc.iceGatheringState}`, 'info');
+      };
+
+      // 创建一个 offer 来触发 ICE 收集
+      pc.createDataChannel('test');
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      // 等待 ICE 收集完成
+      await new Promise((resolve) => {
+        if (pc.iceGatheringState === 'complete') {
+          resolve();
+        } else {
+          pc.addEventListener('icegatheringstatechange', () => {
+            if (pc.iceGatheringState === 'complete') {
+              resolve();
+            }
+          });
+        }
+
+        // 超时
+        setTimeout(resolve, 10000);
+      });
+
+      log('', 'info');
+      log('收集完成！结果汇总:', 'info');
+      log(`  HOST candidates: ${candidates.host}`, candidates.host > 0 ? 'success' : 'error');
+      log(`  SRFLX candidates: ${candidates.srflx}`, candidates.srflx > 0 ? 'success' : 'error');
+      log(`  RELAY candidates: ${candidates.relay}`, candidates.relay > 0 ? 'success' : 'error');
+      log('', 'info');
+
+      if (candidates.relay > 0) {
+        log('✓ 测试成功！TURN 服务器可以正常使用', 'success');
+        log('  跨网络语音通话应该可以工作', 'success');
+      } else if (candidates.srflx > 0) {
+        log('⚠ TURN 服务器无法连接！', 'error');
+        log('  可能原因:', 'info');
+        log('  1. TURN 服务器被防火墙阻止', 'info');
+        log('  2. 免费 TURN 服务器不稳定或被墙', 'info');
+        log('  3. 网络环境限制了 TURN 协议', 'info');
+        log('', 'info');
+        log('  建议:', 'info');
+        log('  - 尝试使用 VPN', 'info');
+        log('  - 或配置自己的 TURN 服务器', 'info');
+        log('  - 同一局域网下的通话不受影响', 'info');
+      } else {
+        log('✗ 连接完全失败', 'error');
+        log('  请检查网络连接', 'error');
+      }
+
+      pc.close();
+    }
+  </script>
+</body>
+</html>
