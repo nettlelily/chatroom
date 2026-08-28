@@ -11,8 +11,8 @@ services:
         value: production
       - key: SESSION_SECRET
         generateValue: true
-      - key: DB_PATH
-        value: /var/data/chatroom.sqlite
+      - key: DATABASE_URL
+        sync: false
       - key: ANTHROPIC_MODEL
         value: gpt-5.5
       - key: ANTHROPIC_BASE_URL
@@ -25,7 +25,3 @@ services:
         sync: false
       - key: TURN_CREDENTIAL
         sync: false
-    disk:
-      name: chatroom-data
-      mountPath: /var/data
-      sizeGB: 1

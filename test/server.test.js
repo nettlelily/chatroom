@@ -1,11 +1,9 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const os = require("node:os");
-const path = require("node:path");
 const { once } = require("node:events");
 const { io: Client } = require("socket.io-client");
 const request = require("supertest");
+const { Pool } = require("pg");
 const { createChatServer } = require("../server");
 
 function waitForCount(list, count, timeoutMs = 1500) {
@@ -32,29 +30,41 @@ function waitForCount(list, count, timeoutMs = 1500) {
 }
 
 async function startTestServer(options = {}) {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "chatroom-test-"));
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL || "postgresql://localhost:5432/chatroom_test",
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+  });
+
+  await pool.query(`
+    DROP TABLE IF EXISTS attachments CASCADE;
+    DROP TABLE IF EXISTS messages CASCADE;
+    DROP TABLE IF EXISTS users CASCADE;
+  `);
+
   const chatServer = createChatServer({
-    dbPath: path.join(tempDir, "chatroom.sqlite"),
+    pool,
     port: 0,
     sessionSecret: "test-secret",
     claudeCooldownMs: 200,
     ...options
   });
 
-  await new Promise((resolve) => {
-    chatServer.server.listen(0, "127.0.0.1", resolve);
-  });
+  await chatServer.start();
 
   const address = chatServer.server.address();
   const baseUrl = `http://127.0.0.1:${address.port}`;
 
   return {
     ...chatServer,
-    tempDir,
     baseUrl,
     async cleanup() {
       await chatServer.close();
-      fs.rmSync(tempDir, { recursive: true, force: true });
+      await pool.query(`
+        DROP TABLE IF EXISTS attachments CASCADE;
+        DROP TABLE IF EXISTS messages CASCADE;
+        DROP TABLE IF EXISTS users CASCADE;
+      `);
+      await pool.end();
     }
   };
 }
