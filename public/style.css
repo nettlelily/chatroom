@@ -509,12 +509,31 @@ h2 {
   .message-form button[type="submit"] {
     width: 100%;
   }
+
+  /* 移动端隐藏侧边栏，让聊天区域占满屏幕 */
+  .chat-sidebar {
+    display: none;
+  }
 }
 
 @media (max-width: 720px) {
+  /* 增大整体字体 */
+  body {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
   .chat-header {
     flex-direction: column;
     align-items: flex-start;
+    padding: 16px;
   }
 
   .header-actions {
@@ -532,6 +551,47 @@ h2 {
   .messages,
   .message-form {
     border-radius: 18px;
+  }
+
+  /* 增大按钮尺寸 */
+  button {
+    min-height: 48px;
+    padding: 0 24px;
+    font-size: 16px;
+  }
+
+  .online-badge {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  /* 增大输入框 */
+  input {
+    padding: 16px 18px;
+    font-size: 16px;
+  }
+
+  /* 增大消息气泡 */
+  .message {
+    padding: 14px 16px;
+    font-size: 16px;
+    border-radius: 20px;
+  }
+
+  .message-meta {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  /* 增大消息输入区域 */
+  .message-form {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .message-form button {
+    min-height: 52px;
+    font-size: 17px;
   }
 }
 
