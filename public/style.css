@@ -466,10 +466,235 @@ h2 {
 
 .message-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  grid-template-areas:
+    "preview preview preview preview"
+    "input emoji attach send";
   gap: 10px;
   border-top: 1px solid var(--border);
   padding: 16px;
+}
+
+.message-form #messageInput {
+  grid-area: input;
+}
+
+.message-form #emojiButton {
+  grid-area: emoji;
+}
+
+.message-form #attachButton {
+  grid-area: attach;
+}
+
+.message-form button[type="submit"] {
+  grid-area: send;
+}
+
+.reply-preview {
+  grid-area: preview;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bubble);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+
+.reply-preview-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.reply-preview-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.reply-preview-text {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reply-preview-cancel {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  min-width: unset;
+}
+
+.reply-preview-cancel:hover {
+  color: var(--text);
+  background: none;
+  transform: none;
+}
+
+.message.reply {
+  position: relative;
+}
+
+.message-reply-to {
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.message-reply-to:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.message-reply-to-label {
+  display: block;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+
+.message-reply-to-text {
+  display: block;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-context-menu {
+  position: fixed;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  min-width: 120px;
+  z-index: 2000;
+}
+
+.message-context-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  min-width: unset;
+  min-height: unset;
+}
+
+.message-context-menu button:hover {
+  background: var(--bubble);
+  transform: none;
+}
+
+.emoji-modal-content {
+  max-width: 400px;
+}
+
+.emoji-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  justify-content: center;
+}
+
+.emoji-tab {
+  min-width: unset;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font-size: 24px;
+  background: rgba(79, 70, 229, 0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.emoji-tab:hover {
+  background: rgba(79, 70, 229, 0.16);
+}
+
+.emoji-tab.active {
+  background: var(--primary);
+  transform: scale(1.05);
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.emoji-item {
+  min-width: unset;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  font-size: 24px;
+  background: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.emoji-item:hover {
+  background: var(--bubble);
+  transform: scale(1.15);
+}
+
+@keyframes mention-flash {
+  0%, 100% {
+    background: var(--mention);
+    border-color: rgba(217, 119, 6, 0.32);
+  }
+  50% {
+    background: rgba(255, 228, 163, 0.6);
+    border-color: rgba(217, 119, 6, 0.5);
+  }
+}
+
+.message.mention {
+  animation: mention-flash 0.6s ease-in-out 3;
+  border: 1px solid rgba(217, 119, 6, 0.32);
+  background: var(--mention);
 }
 
 .message-form button {

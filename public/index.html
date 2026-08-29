@@ -107,11 +107,49 @@
 
             <form id="messageForm" class="message-form">
               <label class="sr-only" for="messageInput">聊天内容</label>
+              <div id="replyPreview" class="reply-preview hidden">
+                <div class="reply-preview-content">
+                  <span class="reply-preview-label">回复</span>
+                  <span id="replyPreviewText" class="reply-preview-text"></span>
+                </div>
+                <button id="cancelReplyButton" class="reply-preview-cancel" type="button">&times;</button>
+              </div>
               <input id="messageInput" name="message" type="text" maxlength="500" autocomplete="off" placeholder="输入文字消息..." />
               <input id="fileInput" class="hidden" type="file" accept="image/*,.pdf,.docx,.zip" />
+              <button id="emojiButton" class="ghost-button" type="button" title="插入表情">😊</button>
               <button id="attachButton" class="ghost-button" type="button">发送文件</button>
               <button type="submit">发送</button>
             </form>
+          </section>
+        </section>
+      </section>
+
+      <!-- Emoji 选择器模态框 -->
+      <div id="emojiModal" class="modal hidden" role="dialog" aria-labelledby="emojiModalTitle" aria-modal="true">
+        <div class="modal-content emoji-modal-content">
+          <div class="modal-header">
+            <h2 id="emojiModalTitle">选择表情</h2>
+            <button id="closeEmojiButton" class="close-button" type="button" aria-label="关闭">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="emoji-tabs">
+              <button class="emoji-tab active" data-category="笑脸" type="button">😀</button>
+              <button class="emoji-tab" data-category="手势" type="button">👍</button>
+              <button class="emoji-tab" data-category="爱心" type="button">❤️</button>
+              <button class="emoji-tab" data-category="表情" type="button">🥰</button>
+              <button class="emoji-tab" data-category="符号" type="button">✨</button>
+            </div>
+            <div id="emojiGrid" class="emoji-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 访问记录模态框 -->
+      <div id="visitLogsModal" class="modal hidden" role="dialog" aria-labelledby="visitLogsModalTitle" aria-modal="true">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="visitLogsModalTitle">聊天室访问记录</h2>
+            <button id="closeVisitLogsButton" class="close-button" type="button" aria-label="关闭">&times;</button>
           </section>
         </section>
       </section>
