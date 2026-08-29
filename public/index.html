@@ -60,6 +60,7 @@
           <div class="header-actions">
             <div class="online-badge">在线 <span id="onlineCount">0</span></div>
             <button id="showRosterButton" class="ghost-button mobile-only hidden" type="button">通话</button>
+            <button id="visitLogsButton" class="ghost-button hidden" type="button">访问记录</button>
             <button id="logoutButton" class="ghost-button hidden" type="button">退出账号</button>
           </div>
         </header>
@@ -114,6 +115,21 @@
           </section>
         </section>
       </section>
+
+      <!-- 访问记录模态框 -->
+      <div id="visitLogsModal" class="modal hidden" role="dialog" aria-labelledby="visitLogsModalTitle" aria-modal="true">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="visitLogsModalTitle">聊天室访问记录</h2>
+            <button id="closeVisitLogsButton" class="close-button" type="button" aria-label="关闭">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div id="visitLogsList" class="visit-logs-list">
+              <p class="muted">加载中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script src="/socket.io/socket.io.js"></script>
